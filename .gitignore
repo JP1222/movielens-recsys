@@ -1,0 +1,23 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+.python-version
+.venv/
+venv/
+
+# Data artifacts
+data/artifacts/
+data/raw/
+
+# Node artifacts
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# VSCode and IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
