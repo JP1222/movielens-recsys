@@ -94,6 +94,14 @@ npm run dev
 ```
 Visit `http://localhost:5173`. The Vite dev server proxies API calls to `http://localhost:8000` (configured in `vite.config.ts`).
 
+### Movie posters (TMDB)
+- Create `frontend/.env.local` (already gitignored) and add:
+  ```
+  VITE_TMDB_API_KEY=your-tmdb-api-key
+  VITE_TMDB_BEARER_TOKEN=your-tmdb-read-token
+  ```
+- Restart `npm run dev` so the client can fetch poster artwork from TMDB.
+
 ## Validation & Evaluation
 - Smoke test the API: `curl http://localhost:8000/recommend/popular?k=5`
 - Front-end linting: `npm run lint`
