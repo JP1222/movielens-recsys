@@ -80,8 +80,10 @@ class RecommenderService:
         return [
             {
                 "movie_id": int(row.movieId),
-                "title": row.clean_title if isinstance(row.clean_title, str) and row.clean_title else getattr(row, "title", str(row.movieId)),
-                "genres": row.genres_list if isinstance(row.genres_list, list) else [],
+                "title": self._format_title(
+                    getattr(row, "clean_title", None) or getattr(row, "title", str(row.movieId))
+                ),
+                "genres": self._coerce_genres(getattr(row, "genres_list", None)),
                 "score": float(row.bayesian_score),
                 "source": "popular",
                 "reason": "Highly rated by the community.",
@@ -176,12 +178,9 @@ class RecommenderService:
         if row.empty:
             return {"title": f"Movie {movie_id}", "genres": []}
         entry = row.iloc[0]
-        genres = entry.get("genres_list")
-        if hasattr(genres, "tolist"):
-            genres = genres.tolist()
         return {
-            "title": entry.get("clean_title") or entry.get("title"),
-            "genres": genres or [],
+            "title": self._format_title(entry.get("clean_title") or entry.get("title")),
+            "genres": self._coerce_genres(entry.get("genres_list")),
             "year": entry.get("year"),
         }
 
@@ -208,3 +207,35 @@ class RecommenderService:
         if isinstance(value, (set, tuple)):
             return list(value)
         return [value]
+
+    @staticmethod
+    def _coerce_genres(value: object) -> List[str]:
+        """Normalize heterogeneous genre containers into a simple list of strings."""
+
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return [str(v) for v in value]
+        if hasattr(value, "tolist"):
+            converted = value.tolist()
+            if isinstance(converted, list):
+                return [str(v) for v in converted]
+            return [str(converted)]
+        if isinstance(value, (tuple, set)):
+            return [str(v) for v in value]
+        if isinstance(value, str):
+            return [value]
+        return []
+
+    @staticmethod
+    def _format_title(raw_title: object) -> str:
+        """Present titles without the trailing article suffix used in MovieLens metadata."""
+
+        if not raw_title:
+            return ""
+        title = str(raw_title).strip()
+        for article in ("The", "An", "A"):
+            suffix = f", {article}"
+            if title.endswith(suffix):
+                return f"{article} {title[: -len(suffix)].strip()}"
+        return title

@@ -13,6 +13,8 @@ data/raw/
 node_modules/
 frontend/node_modules/
 frontend/dist/
+frontend/.env*
+.env*
 
 # VSCode and IDE
 .idea/
@@ -20,4 +22,3 @@ frontend/dist/
 
 # Logs
 *.log
-
